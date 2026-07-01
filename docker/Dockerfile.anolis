@@ -8,7 +8,7 @@ WORKDIR /home
 RUN dnf install -y unzip g++
 RUN curl -LO https://github.com/nodejs/node/archive/refs/tags/${NODE_BRANCH}.zip \
   && unzip ${NODE_BRANCH}.zip \
-  && folder=node-$NODE_BRANCH \
+  && folder=node-${NODE_BRANCH#v} \
   && echo "folder=$folder" \
   && cd $folder \
   && ./configure --openssl-no-asm \
