@@ -2,9 +2,9 @@ name: loong64
 on:
   push:
     branches:
-      - '*'
+      - loong64-*
     tags:
-      - '*'
+      - release-loong64-*
   pull_request:
     branches:
       - loong64-*
