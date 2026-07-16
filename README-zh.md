@@ -1,4 +1,46 @@
+# Node.js for LoongArch (loong64)
+
 <p align="center"><a href="README.md">English</a> | <a href="README-zh.md">中文</a></p>
+
+将 [Node.js](https://nodejs.org/) Docker 容器镜像移植到 **LoongArch (loong64)** 架构。
+
+本仓库基于上游 [nodejs/unofficial-builds](https://github.com/nodejs/unofficial-builds)，构建并发布适用于 LoongArch 的 Node.js 容器镜像。
+
+## Docker 镜像
+
+镜像发布在 Docker Hub 上的
+[`kubernetesloong64/node-loong64`](https://hub.docker.com/r/kubernetesloong64/node-loong64)。
+
+- [![kubernetesloong64/node-loong64](https://img.shields.io/docker/v/kubernetesloong64/node-loong64/v20.20.2-debian?arch=loong64&logo=docker&label=kubernetesloong64%2Fnode-loong64&sort=semver)](https://hub.docker.com/r/kubernetesloong64/node-loong64/tags)
+- [![kubernetesloong64/node-loong64](https://img.shields.io/docker/v/kubernetesloong64/node-loong64/v22.23.1-debian?arch=loong64&logo=docker&label=kubernetesloong64%2Fnode-loong64&sort=semver)](https://hub.docker.com/r/kubernetesloong64/node-loong64/tags)
+- [![kubernetesloong64/node-loong64](https://img.shields.io/docker/v/kubernetesloong64/node-loong64/v24.18.0-debian?arch=loong64&logo=docker&label=kubernetesloong64%2Fnode-loong64&sort=semver)](https://hub.docker.com/r/kubernetesloong64/node-loong64/tags)
+- [![kubernetesloong64/node-loong64](https://img.shields.io/docker/v/kubernetesloong64/node-loong64/v26.5.0-debian?arch=loong64&logo=docker&label=kubernetesloong64%2Fnode-loong64&sort=semver)](https://hub.docker.com/r/kubernetesloong64/node-loong64/tags)
+
+每个版本提供三种基础镜像变体：
+
+- **anolis** — 基于 `openanolis/anolisos:23.4`
+- **debian** — 基于 `lcr.loongnix.cn/debian:14`
+- **debian-slim** — 基于 `lcr.loongnix.cn/debian:14-slim`
+
+### 拉取镜像
+
+```shell
+docker pull kubernetesloong64/node-loong64:v20.20.2-anolis
+docker pull kubernetesloong64/node-loong64:v20.20.2-debian
+docker pull kubernetesloong64/node-loong64:v20.20.2-debian-slim
+
+docker pull kubernetesloong64/node-loong64:v22.23.1-anolis
+docker pull kubernetesloong64/node-loong64:v22.23.1-debian
+docker pull kubernetesloong64/node-loong64:v22.23.1-debian-slim
+
+docker pull kubernetesloong64/node-loong64:v24.18.0-anolis
+docker pull kubernetesloong64/node-loong64:v24.18.0-debian
+docker pull kubernetesloong64/node-loong64:v24.18.0-debian-slim
+
+docker pull kubernetesloong64/node-loong64:v26.5.0-anolis
+docker pull kubernetesloong64/node-loong64:v26.5.0-debian
+docker pull kubernetesloong64/node-loong64:v26.5.0-debian-slim
+```
 
 ## 验证发布
 
