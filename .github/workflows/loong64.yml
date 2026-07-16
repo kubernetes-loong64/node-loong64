@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       DOCKER_TAG: ${{ steps.extract.outputs.DOCKER_TAG }}
-      NODE_BRANCH: ${{ steps.extract.outputs.NODE_BRANCH }}
+      NODE_VERSION: ${{ steps.extract.outputs.NODE_VERSION }}
       IS_STABLE: ${{ steps.extract.outputs.IS_STABLE }}
     strategy:
       fail-fast: false
@@ -60,10 +60,10 @@ jobs:
           fi
           echo "RAW_VERSION=$RAW_VERSION"
           echo "RAW_VERSION=$RAW_VERSION" >> ${GITHUB_ENV}
-          NODE_BRANCH=$(echo $RAW_VERSION | awk -F'+' '{print $1}')
-          echo "NODE_BRANCH=$NODE_BRANCH"
-          echo "NODE_BRANCH=$NODE_BRANCH" >> ${GITHUB_ENV}
-          echo "NODE_BRANCH=$NODE_BRANCH" >> ${GITHUB_OUTPUT}
+          NODE_VERSION=$(echo $RAW_VERSION | awk -F'+' '{print $1}')
+          echo "NODE_VERSION=$NODE_VERSION"
+          echo "NODE_VERSION=$NODE_VERSION" >> ${GITHUB_ENV}
+          echo "NODE_VERSION=$NODE_VERSION" >> ${GITHUB_OUTPUT}
           DOCKER_TAG=$(echo $RAW_VERSION | sed 's/+/-/g')
           echo "DOCKER_TAG=$DOCKER_TAG"
           echo "DOCKER_TAG=$DOCKER_TAG" >> ${GITHUB_ENV}
@@ -90,7 +90,7 @@ jobs:
             --no-cache \
             -f "docker/${{ matrix.base.dockerfile }}" \
             --load \
-            --build-arg "NODE_BRANCH=${{ env.NODE_BRANCH }}" \
+            --build-arg "NODE_VERSION=${{ env.NODE_VERSION }}" \
             --build-arg "BASE_IMAGE=${{ matrix.base.base_image }}" \
             --platform linux/loong64 \
             -t "$IMAGE_REF" \
@@ -125,7 +125,7 @@ jobs:
     env:
       BASE_URL: https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}
       DOCKER_TAG: ${{ needs.build.outputs.DOCKER_TAG }}
-      NODE_BRANCH: ${{ needs.build.outputs.NODE_BRANCH }}
+      NODE_VERSION: ${{ needs.build.outputs.NODE_VERSION }}
       IS_STABLE: ${{ needs.build.outputs.IS_STABLE }}
     steps:
       - name: Download container images
@@ -153,21 +153,21 @@ jobs:
 
           for os in anolis debian debian-slim; do
             IMAGE_REF=${{ env.NAMESPACE }}/node-loong64:${{ env.DOCKER_TAG }}-$os
-            NODE_BRANCH_IMAGE_REF=${{ env.NAMESPACE }}/node-loong64:${{ env.NODE_BRANCH }}-$os
+            NODE_VERSION_IMAGE_REF=${{ env.NAMESPACE }}/node-loong64:${{ env.NODE_VERSION }}-$os
             echo "=== Pushing $IMAGE_REF ==="
             docker push $IMAGE_REF
-            docker tag $IMAGE_REF $NODE_BRANCH_IMAGE_REF
-            docker push $NODE_BRANCH_IMAGE_REF
+            docker tag $IMAGE_REF $NODE_VERSION_IMAGE_REF
+            docker push $NODE_VERSION_IMAGE_REF
 
             if [ "${{ env.IS_STABLE }}" = "true" ]; then
               ALT_IMAGE=${{ env.NAMESPACE }}/node:${{ env.DOCKER_TAG }}-$os
-              NODE_BRANCH_ALT_IMAGE=${{ env.NAMESPACE }}/node:${{ env.NODE_BRANCH }}-$os
+              NODE_VERSION_ALT_IMAGE=${{ env.NAMESPACE }}/node:${{ env.NODE_VERSION }}-$os
               echo "=== Tagging and pushing $ALT_IMAGE ==="
               docker tag $IMAGE_REF $ALT_IMAGE
               docker push $ALT_IMAGE
 
-              docker tag $IMAGE_REF $NODE_BRANCH_ALT_IMAGE
-              docker push $NODE_BRANCH_ALT_IMAGE
+              docker tag $IMAGE_REF $NODE_VERSION_ALT_IMAGE
+              docker push $NODE_VERSION_ALT_IMAGE
             fi
           done
 
@@ -243,7 +243,7 @@ jobs:
       contents: read
     env:
       DOCKER_TAG: ${{ needs.build.outputs.DOCKER_TAG }}
-      NODE_BRANCH: ${{ needs.build.outputs.NODE_BRANCH }}
+      NODE_VERSION: ${{ needs.build.outputs.NODE_VERSION }}
       IS_STABLE: ${{ needs.build.outputs.IS_STABLE }}
     steps:
       - name: Download container images
@@ -271,12 +271,12 @@ jobs:
           for os in anolis debian debian-slim; do
             IMAGE_REF=${{ env.NAMESPACE }}/node-loong64:${{ env.DOCKER_TAG }}-$os
             SYNC_IMAGE_REF=${{ vars.SYNC_REGISTRY }}/${{ env.NAMESPACE }}/node-loong64:${{ env.DOCKER_TAG }}-$os
-            SYNC_NODE_BRANCH_IMAGE_REF=${{ vars.SYNC_REGISTRY }}/${{ env.NAMESPACE }}/node-loong64:${{ env.NODE_BRANCH }}-$os
+            SYNC_NODE_VERSION_IMAGE_REF=${{ vars.SYNC_REGISTRY }}/${{ env.NAMESPACE }}/node-loong64:${{ env.NODE_VERSION }}-$os
             echo "=== Syncing $IMAGE_REF -> $SYNC_IMAGE_REF ==="
             docker tag $IMAGE_REF $SYNC_IMAGE_REF
             docker push $SYNC_IMAGE_REF
 
-            docker tag $IMAGE_REF $SYNC_NODE_BRANCH_IMAGE_REF
-            docker push $SYNC_NODE_BRANCH_IMAGE_REF
+            docker tag $IMAGE_REF $SYNC_NODE_VERSION_IMAGE_REF
+            docker push $SYNC_NODE_VERSION_IMAGE_REF
           done
           echo "=== Registry sync complete ==="

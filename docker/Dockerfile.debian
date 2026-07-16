@@ -1,26 +1,21 @@
 ARG BASE_IMAGE=lcr.loongnix.cn/debian:14
 FROM $BASE_IMAGE AS builder
 
-ARG NODE_BRANCH=v26.3.1
+ARG NODE_VERSION=v22.23.1
 
 WORKDIR /home
 
 RUN apt update \
-  && apt install -y curl ca-certificates unzip make python3 g++
-RUN curl -LO https://github.com/nodejs/node/archive/refs/tags/${NODE_BRANCH}.zip \
-  && unzip ${NODE_BRANCH}.zip \
-  && folder=node-${NODE_BRANCH#v} \
-  && echo "folder=$folder" \
-  && cd $folder \
-  && ./configure --openssl-no-asm \
-  && make -j$(nproc) prefix=/usr/local \
-  && make -j$(nproc) install DESTDIR=/tmp/node-staging prefix=/usr/local \
-  && find /tmp/node-staging \
+  && apt install -y curl ca-certificates
+RUN curl -fsSL https://unofficial-builds.nodejs.org/download/release/${NODE_VERSION}/node-${NODE_VERSION}-linux-loong64.tar.gz \
+  -o node.tar.gz \
+  && mkdir -p /tmp/node-staging/usr/local \
+  && tar -xzf node.tar.gz -C /tmp/node-staging/usr/local --strip-components=1 \
   && /tmp/node-staging/usr/local/bin/node --version
 
 FROM $BASE_IMAGE
 
-ARG NODE_BRANCH=v26.3.1
+ARG NODE_VERSION=v22.23.1
 
 COPY --from=builder /tmp/node-staging/usr/local /usr/local
 
@@ -29,12 +24,11 @@ LABEL maintainer="徐晓伟 <xuxiaowei@xuxiaowei.com.cn>" \
       org.opencontainers.image.authors="徐晓伟 <xuxiaowei@xuxiaowei.com.cn>" \
       org.opencontainers.image.licenses="Apache-2.0" \
       org.opencontainers.image.title="LoongArch node" \
-      org.opencontainers.image.description="node ${NODE_BRANCH} for LoongArch (loong64)" \
-      org.opencontainers.image.version="${NODE_BRANCH}" \
+      org.opencontainers.image.description="node ${NODE_VERSION} for LoongArch (loong64)" \
+      org.opencontainers.image.version="${NODE_VERSION}" \
       org.opencontainers.image.url="https://github.com/kubernetes-loong64/node-loong64" \
       org.opencontainers.image.source="https://github.com/kubernetes-loong64/node-loong64"
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends libatomic \
-    && rm -rf /var/lib/apt/lists/* \
-    && node -v
+RUN node -v \
+    && npm -v \
+    && npx -v
